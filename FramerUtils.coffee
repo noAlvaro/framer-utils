@@ -24,13 +24,13 @@ window['FramerUtils'] = class exports.FramerUtils
 
 	# Require modules and create shortcuts for them in global scope
 	@linkModules: (modules...) -> for module in modules
-		MyUtils.loadModules module; MyUtils.createShortcuts window[module]
+		FramerUtils.loadModules module; FramerUtils.createShortcuts window[module]
 
 	# Initialize settings
-	MyUtils.createShortcuts Events
-	MyUtils.loadModules 'Type', 'Spring', 'Frame', 'Point'
-	MyUtils.linkModules 'Easings', 'Springs', 'Directions', 'Colors'
-	MyUtils.loadModules 'StateManager', 'StateSetup', 'LayerSetup', 'TextLayer'
+	FramerUtils.createShortcuts Events
+	FramerUtils.loadModules 'Type', 'Spring', 'Frame', 'Point'
+	FramerUtils.linkModules 'Easings', 'Springs', 'Directions', 'Colors'
+	FramerUtils.loadModules 'StateManager', 'StateSetup', 'LayerSetup'
 
 	# Framer bug on printing routine :(
 	# https://www.facebook.com/groups/framerjs/permalink/784989038294836/
@@ -49,8 +49,8 @@ window['FramerUtils'] = class exports.FramerUtils
 	# Start the state managing framework
 	@load: (path) ->
 		layers = Framer.Importer.load path
-		MyUtils.recordOriginals layers
-		MyUtils.createShortcuts layers
+		FramerUtils.recordOriginals layers
+		FramerUtils.createShortcuts layers
 		StateManager.init layers
 
 	# Records original frames
@@ -93,7 +93,7 @@ window['FramerUtils'] = class exports.FramerUtils
 
 	# Convert six digit CSS hex strings into CSS rgba function string
 	@hexToRgba = (hexColor, opacity = 1) ->
-		hexColor = MyUtils.fullHex hexColor
+		hexColor = FramerUtils.fullHex hexColor
 		r = parseInt hexColor.substring(1, 3), 16
 		g = parseInt hexColor.substring(3, 5), 16
 		b = parseInt hexColor.substring(5, 7), 16

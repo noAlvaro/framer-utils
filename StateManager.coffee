@@ -39,7 +39,7 @@ class exports.StateManager
   @ON: (layer, instant) -> layer.visible = true unless @NEEDS_PHASING layer, @OFF_DEFINITION
 
   @OFF: (layer, instant) -> if @NEEDS_PHASING layer, @OFF_DEFINITION
-    if instant then MyUtils.castAllProps @OFF_DEFINITION, layer; else
+    if instant then FramerUtils.castAllProps @OFF_DEFINITION, layer; else
       # Unworkaroundable issue: FramerJS fails to remove the listener
       # layer.on AnimationEnd, StateManager.PHASE_OUT
       layer.animate properties: @OFF_DEFINITION, time: @DEFAULT_TIME, curve: @DEFAULT_CURVE
