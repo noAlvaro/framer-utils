@@ -1,109 +1,129 @@
-window['FramerUtils'] = class exports.FramerUtils
+class exports.FramerUtils
 
-	# String improvements
-	String::splice = (index, count, add = "") -> @slice(0, index) + add + @slice index + count
+	@number:
 
-	# Array improvements
-	Array::remove = (item) -> @splice(index, 1) if (index = @indexOf item) > -1
-	Array::removeIf = (item) -> @remove item if item in @
-	Array::pushIfNew = (item) -> @push item unless item in @
+		cycle: (int, length) ->
+			if (output = int % length) < 0 then length + output else output
 
-	# Object improvements
-	# Object::asList = -> output = []; output.push v for k, v of @; output
+		clip: (v, min, max) ->
+			Math.min Math.max(v, min), max
 
-	# Function improvements
-	Function::accessor = (scope, prop, desc) -> Object.defineProperty scope, prop, desc
+		invert: (value, condition) ->
+			value - 2 * value * Number Boolean not condition
 
-	# Require modules in global scope
-	@loadModules: (modules...) -> for module in modules
-		window[module] = require(module)[module]
+		almostEqual: (a, b, epsilon = .001) -> Math.abs(a - b) < epsilon
 
-	# Create shortcuts for whatever
-	@createShortcuts: (scopes...) ->
-		window[prop] = scope[prop] for prop of scope for scope in scopes
+		nearestEven: (v) -> 2 * Math.round(v / 2)
 
-	# Require modules and create shortcuts for them in global scope
-	@linkModules: (modules...) -> for module in modules
-		FramerUtils.loadModules module; FramerUtils.createShortcuts window[module]
 
-	# Initialize settings
-	FramerUtils.createShortcuts Events
-	FramerUtils.loadModules 'Type', 'Spring', 'Frame', 'Point'
-	FramerUtils.linkModules 'Easings', 'Springs', 'Directions', 'Colors'
-	FramerUtils.loadModules 'StateManager', 'StateSetup', 'LayerSetup'
+	@object:
 
-	# Framer bug on printing routine :(
-	# https://www.facebook.com/groups/framerjs/permalink/784989038294836/
-	# Object::desc = (props...) ->
-		# filterProps = props.length
-		# isArray = @ instanceof Array
-		# output = []
-		# v.constructor for p, v of @
-			# continue if filterProps and not (p in props)
-			# s = switch typeof v
-				# when Type.Boolean, Type.Number, Type.String then v
-				# when Type.Function then "#{v.name}()"
-				# else "#{v.constructor.name}#{(if v instanceof Array then '[]' else '{}').splice 1, 0, Object.keys(v).length}"
+		clone: (object) ->
+			unless object instanceof Array
+				output = {}
+				output[prop] = value for prop, value of object
+				output
+			else object.slice()
 
-	# Loads; Records original frame values; Creates shortcuts for layers
-	# Start the state managing framework
-	@load: (path) ->
-		layers = Framer.Importer.load path
-		FramerUtils.recordOriginals layers
-		FramerUtils.createShortcuts layers
-		StateManager.init layers
+		# Cast selected properties from an object to another
+		castProps: (from, to, props...) -> to[prop] = from[prop] for prop in props; to
 
-	# Records original frames
-	@recordOriginals: (layers) -> for layerName of layers
-		scope = layers[layerName]; scope.originalFrame = scope.frame
+		# Cast selected properties if they don't exists in 'to' object
+		castPropsIf: (from, to, props...) -> to[prop] ?= from[prop] for prop in props; to
 
-	@clone: (object) ->
-		unless object instanceof Array
-			output = {}
-			output[prop] = value for prop, value of object
-			output
-		else object.slice()
+		# Cast all properties from an object to another
+		castAllProps: (from, to) ->
+			to[prop] = value for prop, value of from; to
 
-	# Animates with default settings
-	@justAnimate: (props) -> time: .4, curve: ExpoInOut, properties: props
+		# Cast all properties if they don't exists in 'to' object
+		castAllPropsIf: (from, to) -> to[prop] ?= value for prop, value of from; to
 
-	# Ensures that a value is between the informed interval
-	@clip: (value, min, max) -> Math.min Math.max(value, min), max
 
-	# Inverts the number if a certain confition is matched
-	@invertIf: (number, condition) -> number - 2 * number * Number(condition)
+	@array:
 
-	# Cast selected properties from an object to another
-	@castProps: (from, to, props...) -> to[prop] = from[prop] for prop in props
+		intersect: (a, b) ->
+			[a, b] = [b, a] if a.length > b.length
+			value for value in a when value in b
 
-	# Cast selected properties if they don't exists in 'to' object
-	@castPropsIf: (from, to, props...) -> to[prop] ?= from[prop] for prop in props
+	Array::first = -> @[0]
+	Array::last = -> @[@length - 1]
 
-	# Cast all properties from an object to another
-	@castAllProps: (from, to) -> to[prop] = value for prop, value of from
 
-	# Cast all properties if they don't exists in 'to' object
-	@castAllPropsIf: (from, to) -> to[prop] ?= value for prop, value of from
+	@color:
 
-	# Add mixin methods and properties to class prototype
-	@mix: (mixin, klass) -> klass::[name] = method for name, method of mixin
+		hexToRgb: (hex) ->
+			result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec hex
+			if result
+				r: parseInt result[1], 16
+				g: parseInt result[2], 16
+				b: parseInt result[3], 16
+			else null
 
-	# Executes a function after a defined amount of time
-	@delay: (time, fn, args...) -> setTimeout fn, time * 1000, args...
+		cssRgba: (hex, alpha) ->
+			rgb = FramerUtils.color.hexToRgb hex
+			"rgba(#{rgb.r},#{rgb.g},#{rgb.b},#{alpha})"
 
-	# Convert six digit CSS hex strings into CSS rgba function string
-	@hexToRgba = (hexColor, opacity = 1) ->
-		hexColor = FramerUtils.fullHex hexColor
-		r = parseInt hexColor.substring(1, 3), 16
-		g = parseInt hexColor.substring(3, 5), 16
-		b = parseInt hexColor.substring(5, 7), 16
-		"rgba(#{r}, #{g}, #{b}, #{opacity})"
 
-	@fullHex = (hexColor) ->
-		if hexColor.length < 7
-			if colorInfo = hexColor.split('#')[1]
-				counter = 6 - colorInfo.length
-				colorInfo = "0#{colorInfo}" while counter-- > 0
-				return "##{colorInfo}"
-			else throw new Error 'Unrecognized hex color signature.'
-		else return hexColor
+	@math:
+
+		distance: (fromPoint, toPoint) -> Math.sqrt (fromPoint.x - toPoint.x) * (fromPoint.x - toPoint.x) + (fromPoint.y - toPoint.y) * (fromPoint.y - toPoint.y)
+
+
+	@geometry:
+
+		rectEdgePoint: (fromPoint, rectFrame, validateInput) ->
+			# Returns the intersection/prolongation point between @fromPoint and @rectFrame's center
+			x = fromPoint.x; y = fromPoint.y; minX = rectFrame.x; minY = rectFrame.y
+			maxX = rectFrame.x + rectFrame.width; maxY = rectFrame.y + rectFrame.height
+			if validateInput and (minX <= x and x <= maxX) and (minY <= y and y <= maxY)
+				throw "Point [#{x}, #{y}] cannot be inside rectangle [#{minX}, #{minY}, #{maxX}, #{maxY}]"
+			midX = (minX + maxX) / 2; midY = (minY + maxY) / 2; m = (midY - y) / (midX - x)
+			if (x <= midX) # check left
+				minXy = m * (minX - x) + y
+				return {x: minX, y: minXy} if (minY <= minXy && minXy <= maxY)
+			if (x >= midX) # check right
+				maxXy = m * (maxX - x) + y
+				return {x: maxX, y: maxXy} if (minY <= maxXy && maxXy <= maxY)
+			if (y <= midY) # check top
+				minYx = (minY - y) / m + x
+				return {x: minYx, y: minY} if (minX <= minYx && minYx <= maxX)
+			if (y >= midY) # check bottom
+				maxYx = (maxY - y) / m + x
+				return {x: maxYx, y: maxY} if (minX <= maxYx && maxYx <= maxX)
+			throw "No intersection for [#{x}, #{y}] inside rectangle [#{minX}, #{minY}, #{maxX}, #{maxY}]"
+
+		linePercentPoint: (pointA, pointB, percent) ->
+			x = if pointA.x isnt pointB.x then pointA.x + percent * (pointB.x - pointA.x) else x = pointA.x
+			y = if pointA.y isnt pointB.y then y = pointA.y + percent * (pointB.y - pointA.y) else y = pointA.y
+			x: x, y: y
+
+
+	@layer:
+
+		localToGlobal: ( localLayer, localPoint = {x: 0, y: 0} ) ->
+			root = localLayer.getGlobalPosition()
+			{x: root.x + localPoint.x, y: root.y + localPoint.y}
+
+		globalToLocal: ( localLayer, globalPoint = {x: 0, y: 0} ) ->
+			root = localLayer.getGlobalPosition()
+			{x: -root.x + globalPoint.x, y: -root.y + globalPoint.y}
+
+
+	Layer::getGlobalPosition = ->
+		xs = ys = 0; scope = @
+		(xs += scope.x; ys += scope.y; scope = scope.parent) while scope
+		{x: xs, y: ys}
+
+	Layer::convertPosition = ( toLayer, localPoint = {x: 0, y: 0} ) ->
+		globalPoint = FramerUtils.layer.localToGlobal @, localPoint
+		FramerUtils.layer.globalToLocal toLayer, globalPoint
+
+
+	@class:
+
+		mixOf = (base, mixins...) ->
+			class Mixed extends base
+				for mixin in mixins by -1 #earlier mixins override later ones
+					for name, method of mixin::
+						Mixed::[name] = method
+			Mixed

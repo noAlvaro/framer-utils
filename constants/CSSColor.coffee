@@ -1,4 +1,4 @@
-class exports.Colors
+class exports.CSSColor
   @AliceBlue 	          = '#F0F8FF'
   @AntiqueWhite 	      = '#FAEBD7'
   @Aqua 	              = '#00FFFF'

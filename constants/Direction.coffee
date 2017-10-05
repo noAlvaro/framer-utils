@@ -1,4 +1,4 @@
-class exports.Directions
+class exports.Direction
   @Up             = 'up'
   @Down           = 'down'
   @Left           = 'left'
