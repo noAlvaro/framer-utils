@@ -1,5 +1,6 @@
-{VRUtils} = require 'VRUtils'
-{TextLayer} = require 'TextLayer'
+# TODO: remove VRUtils and TextLayer dependences
+# {VRUtils} = require 'VRUtils'
+# {TextLayer} = require 'TextLayer'
 
 class exports.FOV extends Layer
 
@@ -8,7 +9,7 @@ class exports.FOV extends Layer
 		super
 			x: -5000
 			y: -5000
-			z: VRUtils.unity.convertZ 9
+			# z: VRUtils.unity.convertZ 9
 			width: 10000
 			height: 10000
 			opacity: .5
