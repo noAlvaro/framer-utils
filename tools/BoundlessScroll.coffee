@@ -1,4 +1,3 @@
-require 'Sugar'
 {FramerUtils} = require 'FramerUtils'
 
 class exports.BoundlessScroll extends ScrollComponent
