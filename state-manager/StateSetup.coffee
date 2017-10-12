@@ -2,7 +2,7 @@ class exports.StateSetup
 
   constructor: (@stateName) ->
     @state = []; @fixed = []; @all = []
-    StateManager.STATES[@stateName] = @
+    StateManager.States[@stateName] = @
 
   addSetup: (layerSetups...) ->
     for setup in layerSetups

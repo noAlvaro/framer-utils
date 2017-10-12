@@ -2,7 +2,7 @@
 
 class exports.BoundlessScroll extends ScrollComponent
 
-  @DEFAULTS:
+  @Defaults:
     name: 'scroll'
     clip: false
     pixelAlign: true
@@ -15,7 +15,7 @@ class exports.BoundlessScroll extends ScrollComponent
     fxSlots: false
 
 
-  @ERRORS:
+  @Errors:
     linesIsntLayer: "BoundlessScroll: provided 'lines' must be an layer of lines."
     badLineHeight: "BoundlessScroll: 'lineHeight' must be a positive number."
     badLinePadding: "BoundlessScroll: 'linePadding' cannot be a negative number."
@@ -25,19 +25,19 @@ class exports.BoundlessScroll extends ScrollComponent
   @define 'lineHeight',
     get: -> @_lineHeight
     set: (v) ->
-      throw new Error exports.BoundlessScroll.ERRORS.badLineHeight unless v? and v > 0
+      throw new Error exports.BoundlessScroll.Errors.badLineHeight unless v? and v > 0
       @updateLines() unless @_lineHeight is @_lineHeight = v
 
   @define 'linePadding',
     get: -> @_linePadding
     set: (v) ->
-      throw new Error exports.BoundlessScroll.ERRORS.badLinePadding unless v? and v >= 0
+      throw new Error exports.BoundlessScroll.Errors.badLinePadding unless v? and v >= 0
       @updateLines() unless @_linePadding is @_linePadding = v
 
   @define 'lineView',
     get: -> @_lineView
     set: (v) ->
-      throw new Error exports.BoundlessScroll.ERRORS.badLines unless v? and v >= 0
+      throw new Error exports.BoundlessScroll.Errors.badLines unless v? and v >= 0
       @updateLines() unless @_lineView isnt @_lineView = v
 
   @define 'snap',
@@ -55,12 +55,12 @@ class exports.BoundlessScroll extends ScrollComponent
   constructor: (@lines, @lineHeight, @linePadding, @lineView, @snap, options = {}) ->
     super _.defaults options,
       width: @lines.width
-      name: exports.BoundlessScroll.DEFAULTS.name
-      snapTreshold: exports.BoundlessScroll.DEFAULTS.snapTreshold
-      scrollHorizontal: exports.BoundlessScroll.DEFAULTS.scrollHorizontal
+      name: exports.BoundlessScroll.Defaults.name
+      snapTreshold: exports.BoundlessScroll.Defaults.snapTreshold
+      scrollHorizontal: exports.BoundlessScroll.Defaults.scrollHorizontal
     @content.addChild @lines
     @content.on 'change:y', => @updateScroll()
-    @content.draggable.pixelAlign = exports.BoundlessScroll.DEFAULTS.pixelAlign
+    @content.draggable.pixelAlign = exports.BoundlessScroll.Defaults.pixelAlign
     @on Events.MouseDown, => @_mouseDown = true
     @on Events.ScrollEnd, => @_isSnapping = @_mouseDown = false; @updateScroll() unless @velocity.y
     @_fx = new BoundlessScrollFx @
@@ -86,7 +86,7 @@ class exports.BoundlessScroll extends ScrollComponent
       middle: if @_fx.bipolar then 0 else 1
     @height = Math.max 0, @lineSize * @_lineView - @_linePadding + 2 * @_fx.boundSize
     slotHeight = @_fx.slots * @lineSize
-    throw new Error exports.BoundlessScroll.ERRORS.badBug if @_lineView + 2 > @totalLines
+    throw new Error exports.BoundlessScroll.Errors.badBug if @_lineView + 2 > @totalLines
     @content.draggable.constraints.y = @height - (@content.height + slotHeight) - @_fx.boundSize
     @content.draggable.constraints.height = (@content.height + slotHeight) * 2 - @height + 2 * @_fx.boundSize
     @updateScroll() if @content.y is @content.y = @_fx.boundSize + slotHeight # one updateScroll execution only
@@ -137,7 +137,7 @@ class BoundlessScrollFx
 
   ###
 
-  @DEFAULTS =
+  @Defaults =
     property:
       name: 'opacity'
       bipolar: false
@@ -145,7 +145,7 @@ class BoundlessScrollFx
     slots: 0
 
   @define 'property',
-    get: -> @_property or BoundlessScrollFx.DEFAULTS.property.name
+    get: -> @_property or BoundlessScrollFx.Defaults.property.name
     set: (v) -> switch typeof v
       when 'string'
         ( @_.resetProperty(); @_property = v; @_.updateScroll() ) unless @property is v
@@ -154,7 +154,7 @@ class BoundlessScrollFx
         if @bipolar is @_bipolar = v.bipolar then @_.updateScroll() else @_.updateLines()
 
   @define 'bipolar',
-    get: -> @_bipolar or BoundlessScrollFx.DEFAULTS.property.bipolar
+    get: -> @_bipolar or BoundlessScrollFx.Defaults.property.bipolar
     set: (v) -> @_.updateLines() unless @bipolar is @_bipolar = v
 
   @define 'boundSize',
@@ -162,11 +162,11 @@ class BoundlessScrollFx
     set: (v) -> @_.updateLines() unless @boundSize is @_boundSize = v
 
   @define 'lines',
-    get: -> @_lines or BoundlessScrollFx.DEFAULTS.lines
+    get: -> @_lines or BoundlessScrollFx.Defaults.lines
     set: (v) -> @_.updateScroll() unless @lines is @_lines = Math.max 1, (Math.min (Math.ceil @_.lineView / 2), v)
 
   @define 'slots',
-    get: -> @_slots or BoundlessScrollFx.DEFAULTS.slots
+    get: -> @_slots or BoundlessScrollFx.Defaults.slots
     set: (v) -> @_.updateLines() unless @slots is @_slots = v
 
   constructor: (@_) ->

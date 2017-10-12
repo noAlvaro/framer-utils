@@ -1,6 +1,6 @@
 class exports.FramerUtils
 
-	@number:
+	@Number:
 
 		cycle: (int, length) ->
 			if (output = int % length) < 0 then length + output else output
@@ -16,7 +16,7 @@ class exports.FramerUtils
 		nearestEven: (v) -> 2 * Math.round(v / 2)
 
 
-	@object:
+	@Object:
 
 		clone: (object) ->
 			unless object instanceof Array
@@ -39,7 +39,7 @@ class exports.FramerUtils
 		castAllPropsIf: (from, to) -> to[prop] ?= value for prop, value of from; to
 
 
-	@array:
+	@Array:
 
 		intersect: (a, b) ->
 			[a, b] = [b, a] if a.length > b.length
@@ -49,7 +49,7 @@ class exports.FramerUtils
 	Array::last = -> @[@length - 1]
 
 
-	@color:
+	@Color:
 
 		hexToRgb: (hex) ->
 			result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec hex
@@ -60,16 +60,16 @@ class exports.FramerUtils
 			else null
 
 		cssRgba: (hex, alpha) ->
-			rgb = FramerUtils.color.hexToRgb hex
+			rgb = FramerUtils.Color.hexToRgb hex
 			"rgba(#{rgb.r},#{rgb.g},#{rgb.b},#{alpha})"
 
 
-	@math:
+	@Math:
 
 		distance: (fromPoint, toPoint) -> Math.sqrt (fromPoint.x - toPoint.x) * (fromPoint.x - toPoint.x) + (fromPoint.y - toPoint.y) * (fromPoint.y - toPoint.y)
 
 
-	@geometry:
+	@Geometry:
 
 		rectEdgePoint: (fromPoint, rectFrame, validateInput) ->
 			# Returns the intersection/prolongation point between @fromPoint and @rectFrame's center
@@ -98,7 +98,7 @@ class exports.FramerUtils
 			x: x, y: y
 
 
-	@layer:
+	@Layer:
 
 		localToGlobal: ( localLayer, localPoint = {x: 0, y: 0} ) ->
 			root = localLayer.getGlobalPosition()
@@ -115,11 +115,11 @@ class exports.FramerUtils
 		{x: xs, y: ys}
 
 	Layer::convertPosition = ( toLayer, localPoint = {x: 0, y: 0} ) ->
-		globalPoint = FramerUtils.layer.localToGlobal @, localPoint
-		FramerUtils.layer.globalToLocal toLayer, globalPoint
+		globalPoint = FramerUtils.Layer.localToGlobal @, localPoint
+		FramerUtils.Layer.globalToLocal toLayer, globalPoint
 
 
-	@class:
+	@Class:
 
 		mixOf = (base, mixins...) ->
 			class Mixed extends base

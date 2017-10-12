@@ -21,7 +21,7 @@ class exports.MockButton extends Layer
 
 class exports.MockWord extends Layer
 
-	@DEFAULTS:
+	@Defaults:
 		wordWidth: 200
 		wordHeight: 20
 		autoFade: false
@@ -36,7 +36,7 @@ class exports.MockWord extends Layer
 	@define 'fadeValue', get: -> Number Boolean (@_write or @_write is undefined)
 
 	@define 'minWidth', get: ->
-		@_minWidth or @_minWidth = MockWord.minWidthFor if @wordHeight is undefined then MockWord.DEFAULTS.wordHeight else @wordHeight
+		@_minWidth or @_minWidth = MockWord.minWidthFor if @wordHeight is undefined then MockWord.Defaults.wordHeight else @wordHeight
 
 	@define 'wordWidth',
 		get: -> @_wordWidth
@@ -71,10 +71,10 @@ class exports.MockWord extends Layer
 		super _.defaults options,
 			name: 'word'
 			wordColor: Utils.randomColor()
-			wordWidth: MockWord.DEFAULTS.wordWidth
-			wordHeight: MockWord.DEFAULTS.wordHeight
-			autoFade: MockWord.DEFAULTS.autoFade
-			write: MockWord.DEFAULTS.write
+			wordWidth: MockWord.Defaults.wordWidth
+			wordHeight: MockWord.Defaults.wordHeight
+			autoFade: MockWord.Defaults.autoFade
+			write: MockWord.Defaults.write
 
 	doWrite: ->
 		@width = Math.max @minWidth, @wordWidth * @_write
@@ -90,7 +90,7 @@ class exports.MockWord extends Layer
 
 class AnchorWord extends exports.MockWord
 
-	@DEFAULTS: padding: exports.MockWord.wordHeight / 2
+	@Defaults: padding: exports.MockWord.wordHeight / 2
 
 	@define 'fadeValue', get: -> Number Boolean (@width >= @minWidth * .9 or @_write is undefined)
 
@@ -99,7 +99,7 @@ class AnchorWord extends exports.MockWord
 		set: (v) -> @emit 'change:width' unless @_padding is @_padding = v; @_padding
 
 	constructor: (@anchor, options={}) ->
-		super _.defaults options, autoFade: true, padding: AnchorWord.DEFAULTS.padding
+		super _.defaults options, autoFade: true, padding: AnchorWord.Defaults.padding
 		@anchor.on event, @reposition for event in ['change:x', 'change:width'] if @anchor
 
 	reposition: => @x = @anchor.x + @anchor.width + @anchor.padding
@@ -111,7 +111,7 @@ class AnchorWord extends exports.MockWord
 
 class exports.MockLine extends Layer
 
-	@DEFAULTS:
+	@Defaults:
 		lineWidth: 200
 		lineHeight: 20
 		justify: false
@@ -169,10 +169,10 @@ class exports.MockLine extends Layer
 	constructor: (options = {}) ->
 		super _.defaults options,
 			name: 'line'
-			lineWidth: MockLine.DEFAULTS.lineWidth
-			lineHeight: MockLine.DEFAULTS.lineHeight
-			justify: MockLine.DEFAULTS.justify
-			write: MockLine.DEFAULTS.write
+			lineWidth: MockLine.Defaults.lineWidth
+			lineHeight: MockLine.Defaults.lineHeight
+			justify: MockLine.Defaults.justify
+			write: MockLine.Defaults.write
 			lineColor: Utils.randomColor()
 			backgroundColor: 'transparent'
 		# @on Events.Click, -> print 'line ' + @y / (@lineHeight + 10), 'y ' + @y, 'fx ' + @opacity, 'id ' + @id
@@ -225,7 +225,7 @@ class exports.MockLine extends Layer
 
 class exports.MockLines extends Layer
 
-	@DEFAULTS:
+	@Defaults:
 		numLines: 2
 		lineWidth: 200
 		lineHeight: 20
@@ -312,13 +312,13 @@ class exports.MockLines extends Layer
 	constructor: (options = {}) ->
 		super _.defaults options,
 			name: 'lines'
-			numLines: exports.MockLines.DEFAULTS.numLines
-			lineWidth: exports.MockLines.DEFAULTS.lineWidth
-			lineHeight: exports.MockLines.DEFAULTS.lineHeight
-			linePadding: exports.MockLines.DEFAULTS.linePadding
-			paragraph: exports.MockLines.DEFAULTS.paragraph
-			justify: exports.MockLines.DEFAULTS.justify
-			write: exports.MockLines.DEFAULTS.write
+			numLines: exports.MockLines.Defaults.numLines
+			lineWidth: exports.MockLines.Defaults.lineWidth
+			lineHeight: exports.MockLines.Defaults.lineHeight
+			linePadding: exports.MockLines.Defaults.linePadding
+			paragraph: exports.MockLines.Defaults.paragraph
+			justify: exports.MockLines.Defaults.justify
+			write: exports.MockLines.Defaults.write
 			lineColor: Utils.randomColor()
 			backgroundColor: 'transparent'
 		@addLine index for index in [0...@_numLines]
