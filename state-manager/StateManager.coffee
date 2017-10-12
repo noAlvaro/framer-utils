@@ -1,8 +1,8 @@
 class exports.StateManager
 
-  @DEFAULT_TIME   = .4
-  @DEFAULT_CURVE  = ExpoOut
-  @OFF_DEFINITION = opacity: 0
+  @DEFAULT_TIME   : .4
+  @DEFAULT_CURVE  : ExpoOut
+  @OFF_DEFINITION : opacity: 0
 
   @init: (layers) ->
     @STATES = {}

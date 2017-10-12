@@ -2,27 +2,7 @@
 
 class exports.BoundlessScroll extends ScrollComponent
 
-  ###
-
-    CONSTRUCTOR
-      lines           object      a layer with nested line layers
-      lineHeight      number      height of one visible line
-      linePadding     number      empty distance between two lines
-      lineView        integer     amount of lines fitting in a view
-      snap            boolean     toggles snap behavior for items
-
-    INSTRUCTIONS
-      1.  This is about scrolling without masking/cliping content
-      2.  Assumes that lines inside 'content' are always ordered
-      3.  Only works for vertical scrolling, you may rotate it though
-      4.  Changing content property outside constructor will break
-      5.  It is still possible to change line layers inside 'content'
-      6.  Changing Y values of layers inside 'content' will break
-      7.  Consider using 'adjust' method to change multiple accessors
-
-  ###
-
-  @DEFAULTS =
+  @DEFAULTS:
     name: 'scroll'
     clip: false
     pixelAlign: true
@@ -35,7 +15,7 @@ class exports.BoundlessScroll extends ScrollComponent
     fxSlots: false
 
 
-  @ERRORS =
+  @ERRORS:
     linesIsntLayer: "BoundlessScroll: provided 'lines' must be an layer of lines."
     badLineHeight: "BoundlessScroll: 'lineHeight' must be a positive number."
     badLinePadding: "BoundlessScroll: 'linePadding' cannot be a negative number."

@@ -21,7 +21,7 @@ class exports.MockButton extends Layer
 
 class exports.MockWord extends Layer
 
-	@DEFAULTS =
+	@DEFAULTS:
 		wordWidth: 200
 		wordHeight: 20
 		autoFade: false
@@ -90,7 +90,7 @@ class exports.MockWord extends Layer
 
 class AnchorWord extends exports.MockWord
 
-	@DEFAULTS = padding: exports.MockWord.wordHeight / 2
+	@DEFAULTS: padding: exports.MockWord.wordHeight / 2
 
 	@define 'fadeValue', get: -> Number Boolean (@width >= @minWidth * .9 or @_write is undefined)
 
@@ -111,7 +111,7 @@ class AnchorWord extends exports.MockWord
 
 class exports.MockLine extends Layer
 
-	@DEFAULTS =
+	@DEFAULTS:
 		lineWidth: 200
 		lineHeight: 20
 		justify: false
@@ -225,7 +225,7 @@ class exports.MockLine extends Layer
 
 class exports.MockLines extends Layer
 
-	@DEFAULTS =
+	@DEFAULTS:
 		numLines: 2
 		lineWidth: 200
 		lineHeight: 20

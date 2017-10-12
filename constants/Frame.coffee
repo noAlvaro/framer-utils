@@ -1,12 +1,12 @@
 class exports.Frame
 
-  @UP             = new Frame  0  , -1  , 0, 1
-  @DOWN           = new Frame  0  ,  0  , 0, 1
-  @LEFT           = new Frame -1  ,  0  , 1, 0
-  @RIGHT          = new Frame  0  ,  0  , 1, 0
-  @VERTICAL       = new Frame  0  , -1  , 0, 2
-  @HORIZONTAL     = new Frame -1  ,  0  , 2, 0
-  @ALL_DIRECTIONS = new Frame -1  , -1  , 2, 2
+  @UP             : new Frame  0  , -1  , 0, 1
+  @DOWN           : new Frame  0  ,  0  , 0, 1
+  @LEFT           : new Frame -1  ,  0  , 1, 0
+  @RIGHT          : new Frame  0  ,  0  , 1, 0
+  @VERTICAL       : new Frame  0  , -1  , 0, 2
+  @HORIZONTAL     : new Frame -1  ,  0  , 2, 0
+  @ALL_DIRECTIONS : new Frame -1  , -1  , 2, 2
 
   @DIRECTIONAL: (direction = AllDirections, size = 1) ->
     output = switch direction
