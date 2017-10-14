@@ -1,6 +1,7 @@
 {FramerUtils} = require 'FramerUtils'
 {Framework} = require 'constants/Framework'
 
+# TODO: optimize by replacing _.omit for _.pick
 class exports.VisualComponent extends Layer
 
 	@Images: {}
