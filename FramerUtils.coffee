@@ -47,7 +47,7 @@ class exports.FramerUtils
 
 	Array::first = -> @[0]
 	Array::last = -> @[@length - 1]
-	Array::rotate = (backward=false) -> if backward then @push @shift() else @unshift @pop()
+	Array::rotate = (reverse=false) -> if reverse then @push @shift() else @unshift @pop(); @
 
 
 	@Color:
