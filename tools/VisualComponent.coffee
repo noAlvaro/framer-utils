@@ -1,3 +1,4 @@
+{FramerUtils} = require 'FramerUtils'
 {Framework} = require 'constants/Framework'
 
 class exports.VisualComponent extends Layer
@@ -8,32 +9,37 @@ class exports.VisualComponent extends Layer
 		titleCase: /\b[A-Z][a-z]*([A-Z][a-z]*)*\b/g
 		camelCase: /\b[a-z]+([A-Z][a-z]*)*\b/g
 
-	@getClassName: (fromString) -> fromString.match(VisualComponent.Regex.titleCase)?[0]
+	@getClassName: (fromString) -> fromString?.match(VisualComponent.Regex.titleCase)?[0]
 
-	@getTargetName: (fromString) -> fromString.split('@')[1]?.match(VisualComponent.Regex.camelCase)?[0]
+	@getTargetName: (fromString) -> fromString?.split('@')[1]?.match(VisualComponent.Regex.camelCase)?[0]
 
-	@getImage: (layer, resetPoint = false) ->
-		candidate = layer.props
-		candidate.x = candidate.y = 0 if resetPoint
-		output = _.omitBy candidate, (v, k) -> Framework.Layer[k] is v
-		output.children = []
-		output.children.push VisualComponent.getImage child for child in layer.children
+	@getImage: (resetPoint, layers...) ->
+		props = _.map layers, 'props'
+		baseImage = if props.length > 1 then @intersectProps props, layers else props[0]
+		baseImage.x = baseImage.y = 0 if resetPoint
+		output = _.omitBy baseImage, (v, k) -> Framework.Layer[k] is v
+		output.children = []; sampleLayer = layers[0]
+		output.children.push VisualComponent.getImage false, child for child in sampleLayer.children; output
+
+	@intersectProps: (props, layers) ->
+		omitedKeys = [];
+		image = _.assignWith {}, props..., (objValue, srcValue, key, object, source) ->
+			return srcValue unless key in Object.keys object
+			omitedKeys.push key unless objValue is srcValue; srcValue
+		output = _.omit image, omitedKeys; output.stagedProfiles = []
+		output.stagedProfiles.push _.pick layer.props, omitedKeys for layer in layers
 		output
 
-# IMPORTANT 1:	layerOptions within initializers will be replaced by props that were customized in Design Tab.
-# IMPORTANT 2:	Subcomponent classes must be available inside `window` scope.
-# In Framer Studio you can declare it liek: `class @ClassName extends VisualComponent`
 
+	# LIMIT: Do not instantiate VisualComponents inside VisualComponents of the same type.
 	constructor: (layerOptions={}, @initializers={}, @initializeOptions=true) ->
 		className = @constructor.name
-		unless image = VisualComponent.Images[className]
-#			TODO: intersect images to disambiguate classes without listeners... like this:
-#			candidates = _.filter(Framer.CurrentContext.layers, (l) -> (VisualComponent.getClassName l.name) is className)
-#			... and then using _.assignInWith to assemble intersection into a single image object
-			unless design = _.find(Framer.CurrentContext.layers, (l) -> (VisualComponent.getClassName l.name) is className)
-				throw new Error "Design for #{className} could not be found."
-			VisualComponent.Images[className] = image = VisualComponent.getImage design, true; design.destroy()
-		super _.defaults layerOptions, image
+		layers = _.filter(Framer.CurrentContext.layers, (l) -> (VisualComponent.getClassName l.name) is className)
+		throw new Error "Design for #{className} could not be found." unless layers.length
+		image = VisualComponent.Images[className] or VisualComponent.Images[className] = VisualComponent.getImage true, layers...
+		refLayer = layers[0]; refLayer.destroy() unless refLayer instanceof VisualComponent
+		profile = if image.stagedProfiles then image.stagedProfiles[0]; image.stagedProfiles.rotate
+		super _.defaults {}, layerOptions, image, profile
 		@addSubLayer childImage for childImage in image.children
 
 	addSubLayer: (image, parent=@) ->
@@ -44,7 +50,6 @@ class exports.VisualComponent extends Layer
 		classObject ?= Layer
 		targetName = VisualComponent.getTargetName image.name
 		initializer = @initializers[targetName] or @initializers[className] or []
-		print @ if className is 'Word'
 		if @initializeOptions and Array.isArray initializer
 			image = _.omit image, Object.keys candidate for candidate in initializer if typeof candidate is 'object' and not Array.isArray candidate
 		else image = _.omit image, Object.keys initializer if typeof initializer is 'object'
