@@ -2,7 +2,7 @@
 {Framework} = require 'constants/Framework'
 
 # TODO: optimize by replacing _.omit for _.pick
-class exports.VisualComponent extends Layer
+class exports.Symbol extends Layer
 
 	@Images: {}
 
@@ -10,9 +10,9 @@ class exports.VisualComponent extends Layer
 		titleCase: /\b[A-Z][a-z]*([A-Z][a-z]*)*\b/g
 		camelCase: /\b[a-z]+([A-Z][a-z]*)*\b/g
 
-	@getClassName: (fromString) -> fromString?.match(VisualComponent.Regex.titleCase)?[0]
+	@getClassName: (fromString) -> fromString?.match(Symbol.Regex.titleCase)?[0]
 
-	@getTargetName: (fromString) -> fromString?.split('@')[1]?.match(VisualComponent.Regex.camelCase)?[0]
+	@getTargetName: (fromString) -> fromString?.split('@')[1]?.match(Symbol.Regex.camelCase)?[0]
 
 	@getImage: (resetPoint, layers...) ->
 		props = _.map layers, 'props'
@@ -20,7 +20,7 @@ class exports.VisualComponent extends Layer
 		baseImage.x = baseImage.y = 0 if resetPoint
 		output = _.omitBy baseImage, (v, k) -> Framework.Layer[k] is v
 		output.children = []; sampleLayer = layers[0]
-		output.children.push VisualComponent.getImage false, child for child in sampleLayer.children; output
+		output.children.push Symbol.getImage false, child for child in sampleLayer.children; output
 
 	@intersectProps: (props, layers) ->
 		omitedKeys = [];
@@ -32,24 +32,24 @@ class exports.VisualComponent extends Layer
 		output
 
 
-	# LIMIT: Do not instantiate VisualComponents inside VisualComponents of the same type.
+	# LIMIT: Do not instantiate Symbols inside Symbols of the same type.
 	constructor: (layerOptions={}, @initializers={}, @initializeOptions=true) ->
 		className = @constructor.name
-		layers = _.filter(Framer.CurrentContext.layers, (l) -> (VisualComponent.getClassName l.name) is className)
+		layers = _.filter(Framer.CurrentContext.layers, (l) -> (Symbol.getClassName l.name) is className)
 		throw new Error "Design for #{className} could not be found." unless layers.length
-		image = VisualComponent.Images[className] or VisualComponent.Images[className] = VisualComponent.getImage true, layers...
-		refLayer = layers[0]; refLayer.destroy() unless refLayer instanceof VisualComponent
+		image = Symbol.Images[className] or Symbol.Images[className] = Symbol.getImage true, layers...
+		refLayer = layers[0]; refLayer.destroy() unless refLayer instanceof Symbol
 		profile = if image.stagedProfiles then image.stagedProfiles[0]; image.stagedProfiles.rotate
 		super _.defaults {}, layerOptions, image, profile
 		@addSubLayer childImage for childImage in image.children
 
 	addSubLayer: (image, parent=@) ->
-		className = VisualComponent.getClassName image.name
+		className = Symbol.getClassName image.name
 		classObject = window[className]
 		if className and not classObject
 			throw new Error "#{@constructor.name} cannot find the required #{className} class to initialize its sub-components."
 		classObject ?= Layer
-		targetName = VisualComponent.getTargetName image.name
+		targetName = Symbol.getTargetName image.name
 		initializer = @initializers[targetName] or @initializers[className] or []
 		if @initializeOptions and Array.isArray initializer
 			image = _.omit image, Object.keys candidate for candidate in initializer if typeof candidate is 'object' and not Array.isArray candidate
