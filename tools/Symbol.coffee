@@ -17,10 +17,12 @@ class exports.Symbol extends Layer
 	@getImage: (resetPoint, layers...) ->
 		props = _.map layers, 'props'
 		baseImage = if props.length > 1 then @intersectProps props, layers else props[0]
+		isText = _.difference(Object.keys(Framework.TextLayerExclusives), Object.keys baseImage).length is 0
+		layerType = if isText then 'TextLayer' else 'Layer'
 		baseImage.x = baseImage.y = 0 if resetPoint
-		output = _.omitBy baseImage, (v, k) -> Framework.Layer[k] is v
-		output.children = []; sampleLayer = layers[0]
-		output.children.push Symbol.getImage false, child for child in sampleLayer.children; output
+		output = _.omitBy baseImage, (v, k) -> Framework[layerType][k] is v
+		output.__isText = isText; output.__children = []; sampleLayer = layers[0]
+		output.__children.push Symbol.getImage false, child for child in sampleLayer.children; output
 
 	@intersectProps: (props, layers) ->
 		omitedKeys = [];
@@ -41,14 +43,14 @@ class exports.Symbol extends Layer
 		refLayer = layers[0]; refLayer.destroy() unless refLayer instanceof Symbol
 		profile = if image.stagedProfiles then image.stagedProfiles[0]; image.stagedProfiles.rotate
 		super _.defaults {}, layerOptions, image, profile
-		@addSubLayer childImage for childImage in image.children
+		@addSubLayer childImage for childImage in image.__children
 
 	addSubLayer: (image, parent=@) ->
 		className = Symbol.getClassName image.name
 		classObject = window[className]
 		if className and not classObject
 			throw new Error "#{@constructor.name} cannot find the required #{className} class to initialize its sub-components."
-		classObject ?= Layer
+		classObject ?= if image.__isText then TextLayer else Layer
 		targetName = Symbol.getTargetName image.name
 		initializer = @initializers[targetName] or @initializers[className] or []
 		if @initializeOptions and Array.isArray initializer
@@ -57,4 +59,4 @@ class exports.Symbol extends Layer
 		instance = new (Function::bind.apply classObject, [null].concat initializer) # also concats objects
 		instance.props = image # will overwrite layerOptions in initializer with Design Tab layouts unless @initializeOptions
 		instance.parent = parent; parent[targetName] = instance if targetName
-		@addSubLayer childImage, (instance or temp) for childImage in image.children if classObject is Layer
+		@addSubLayer childImage, (instance or temp) for childImage in image.__children if classObject is Layer
