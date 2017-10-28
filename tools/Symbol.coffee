@@ -36,10 +36,10 @@ class exports.Symbol extends Layer
 
 	# LIMIT: Do not instantiate Symbols inside Symbols of the same type.
 	constructor: (layerOptions={}, @initializers={}, @initializeOptions=true) ->
-		className = @constructor.name
+		className = @constructor.name; image = Symbol.Images[className]
 		layers = _.filter(Framer.CurrentContext.layers, (l) -> (Symbol.getClassName l.name) is className)
-		throw new Error "Design for #{className} could not be found." unless layers.length
-		image = Symbol.Images[className] or Symbol.Images[className] = Symbol.getImage true, layers...
+		throw new Error "Design for #{className} could not be found." unless image or layers.length
+		image or= Symbol.Images[className] = Symbol.getImage true, layers...
 		refLayer = layers[0]; refLayer.destroy() unless refLayer instanceof Symbol
 		profile = if image.stagedProfiles?.length then image.stagedProfiles.shift()
 		super _.defaults {}, layerOptions, image, profile
