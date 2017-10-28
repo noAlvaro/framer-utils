@@ -41,7 +41,7 @@ class exports.Symbol extends Layer
 		throw new Error "Design for #{className} could not be found." unless layers.length
 		image = Symbol.Images[className] or Symbol.Images[className] = Symbol.getImage true, layers...
 		refLayer = layers[0]; refLayer.destroy() unless refLayer instanceof Symbol
-		profile = if image.stagedProfiles then image.stagedProfiles[0]; image.stagedProfiles.rotate
+		profile = if image.stagedProfiles?.length then image.stagedProfiles.shift()
 		super _.defaults {}, layerOptions, image, profile
 		@addSubLayer childImage for childImage in image.__children
 
