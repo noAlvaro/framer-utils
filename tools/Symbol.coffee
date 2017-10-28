@@ -40,7 +40,7 @@ class exports.Symbol extends Layer
 		layers = _.filter(Framer.CurrentContext.layers, (l) -> (Symbol.getClassName l.name) is className)
 		throw new Error "Design for #{className} could not be found." unless image or layers.length
 		image or= Symbol.Images[className] = Symbol.getImage true, layers...
-		refLayer = layers[0]; refLayer.destroy() unless refLayer instanceof Symbol
+		if refLayer = layers[0] then refLayer.destroy() unless refLayer instanceof Symbol
 		profile = if image.stagedProfiles?.length then image.stagedProfiles.shift()
 		super _.defaults {}, layerOptions, image, profile
 		@addSubLayer childImage for childImage in image.__children
