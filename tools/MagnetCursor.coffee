@@ -76,14 +76,23 @@ class exports.MagnetCursor extends Layer
 
 class MagnetOutline extends Layer
 
+	@define 'outlineColor',
+		get: -> @_outlineColor
+		set: (v) -> unless @_outlineColor is (@_outlineColor = v)
+			@o.style.border = @_borderStyle
+			side.backgroundColor = @_outlineColor for side in @sides
+
+	@define '_borderStyle', get: -> "2px #{@_outlineColor} dotted"
+
+
 	constructor: (options={}) ->
 
 		super _.defaults options, name: 'outline', size: 0, backgroundColor: 'transparent'
 
-		color = FramerUtils.Color.cssRgba '#000000', .5
+		@_outlineColor = 'grey'
 		lineProps =
 			width: 2, height: 2, borderRadius: 2
-			opacity: 0, backgroundColor: color, parent: @
+			opacity: 0, backgroundColor: @_outlineColor, parent: @
 		radius = 23; offset = lineProps.width/2; gain = 14
 		time = .3; time1 = time/3; time2 = time/1.5
 
@@ -91,12 +100,14 @@ class MagnetOutline extends Layer
 			name: 'o', y: offset-radius
 			size: radius*2, borderRadius: radius + gain/2
 			backgroundColor: 'transparent', opacity: 0, parent: @
-			style: border: "2px #{color} dotted"
+			style: border: @_borderStyle
 
 		l = new Layer lineProps
 		r = new Layer _.defaults {}, lineProps, originX: 0, scaleX: -1, x: radius*2
 		t = new Layer _.defaults {}, lineProps, x: radius - offset, y: -radius
 		b = new Layer _.defaults {}, lineProps, x: radius - offset, y: radius
+
+		@sides = [l, r, t, b]
 
 		@a1 = new Animation l, x: radius/2, width: radius/2, opacity: .75, {time: time1, curve: Bezier.easeIn}
 		a2 = new Animation l, x: radius/3*2, width: radius/3, opacity: 1, {time: time2, curve: Bezier.easeOut}
