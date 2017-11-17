@@ -62,10 +62,10 @@ class exports.MagnetCursor extends Layer
 		else
 			point = x: 0, y: 0
 			method = @outline.close
-		if (FramerUtils.Math.distance @placer.point, point) > 10
+
+		if method() or @placer.isAnimating
 			@placer.animate point: point, MagnetCursor.Animation
 		else @placer.point = point
-		method()
 
 
 
@@ -116,5 +116,5 @@ class MagnetOutline extends Layer
 	startRotation: => @interval = setInterval (=> @o.rotation++), 1/30*1000
 	stopRotation: => clearInterval @interval; @o.rotation = 0
 
-	open: => unless @opened then @a1.start(); @opened = true
-	close: => if @opened then @b2.start(); @opened = false
+	open: => unless @opened then @opened = true; @a1.start()
+	close: => if @opened then @opened = false; @b2.start()
