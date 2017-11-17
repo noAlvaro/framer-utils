@@ -1,3 +1,5 @@
+{FramerUtils} = require '../FramerUtils.coffee'
+
 class exports.MagnetLayer extends Layer
 
 	@Configs = ['left', 'right', 'top', 'bottom', 'magnetX', 'magnetY']
@@ -6,6 +8,17 @@ class exports.MagnetLayer extends Layer
 		Events.MouseOver	, Events.MouseOut
 		Events.MouseMove	, Events.MouseWheel
 	]
+	@AreaStyle =
+		show:
+			border: "1px #{FramerUtils.Color.cssRgba '#ddff33', .25} dashed"
+			backgroundColor: FramerUtils.Color.cssRgba '#ddff33', .05
+		hide: border: null, backgroundColor: 'transparent'
+
+
+	@define 'showArea',
+		get: -> @_showArea
+		set: (v) -> unless @_showArea is (@_showArea = v) then @area.style =
+			MagnetLayer.AreaStyle[if @_showArea then 'show' else 'false']
 
 	constructor: (options={}) ->
 
@@ -16,10 +29,13 @@ class exports.MagnetLayer extends Layer
 		@ignoreEvents = true # do not change!
 
 		@area = new Layer
-			parent: @, backgroundColor: 'transparent'
+			parent: @, borderRadius: 8
 			x: -@_config.left; y: -@_config.top
 			width: @width + (@_config.left + @_config.right)
 			height: @height + (@_config.top + @_config.bottom)
+			style: MagnetLayer.AreaStyle.hide
+
+		@_showArea = false
 
 		for e in MagnetLayer.Events
 			@["_#{e}"] = (o) => @addMagnetProperties o
