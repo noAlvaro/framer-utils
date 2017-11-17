@@ -1,4 +1,4 @@
-{FramerUtils} = require 'FramerUtils'
+{FramerUtils} = require '../FramerUtils.coffee'
 
 
 class exports.MockButton extends Layer

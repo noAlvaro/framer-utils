@@ -1,5 +1,5 @@
-{FramerUtils} = require 'FramerUtils'
-{Framework} = require 'constants/Framework'
+{FramerUtils} = require '../FramerUtils.coffee'
+{Framework} = require '../constants/Framework.coffee'
 
 # TODO: optimize by replacing _.omit for _.pick
 class exports.Symbol extends Layer

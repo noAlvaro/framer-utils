@@ -1,5 +1,5 @@
-{Ease} = require 'Ease'
-{VRComponent} = require 'third-party/vr-component/VRComponent'
+{Ease} = require '../Ease.coffee'
+{VRComponent} = require '../third-party/vr-component/VRComponent.coffee'
 
 class exports.Skybox extends VRComponent
 
