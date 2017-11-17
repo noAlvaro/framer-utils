@@ -12,15 +12,16 @@ class exports.MagnetCursor extends Layer
 
 	@Bevel =
 		up:
-			y: 1
-			blur: 2
-			type: 'inner'
+			y: 1, blur: 2, type: 'inner'
 			color: new Color('white').alpha .41
 		down:
-			y: 1
-			blur: 2
-			type: 'inner'
+			y: 1, blur: 2, type: 'inner'
 			color: new Color('white').alpha .80
+
+	@Shadow =
+		one: y: 2, blur: 4, color: new Color('black').alpha .2
+		two: y: 1, blur: 1, color: new Color('black').alpha .1
+
 
 	@Animation =
 		time: .05
@@ -28,7 +29,7 @@ class exports.MagnetCursor extends Layer
 
 	constructor: ->
 
-		super size: 0, backgroundColor: 'transparent'
+		super size: 0, backgroundColor: 'transparent', parent: Framer.Device.hands
 		document.body.style.cursor = 'none'
 
 		@placer = new Layer name: 'placer', size: @size, parent: @
@@ -40,6 +41,8 @@ class exports.MagnetCursor extends Layer
 			borderRadius: radius
 			gradient: MagnetCursor.Fill.up
 			shadow1: MagnetCursor.Bevel.up
+			shadow2: MagnetCursor.Shadow.one
+			shadow3: MagnetCursor.Shadow.two
 
 		radius = 22
 		@cursor.states.down =
@@ -51,6 +54,7 @@ class exports.MagnetCursor extends Layer
 		Framer.Device.screen.on Events.MouseMove, @sync
 		Framer.Device.screen.on Events.MouseDown, => @cursor.stateSwitch 'down'
 		Framer.Device.screen.on Events.MouseUp, => @cursor.animate 'default', time: .25
+		Framer.Device.screen.on "change:children", => print 'here'
 
 		@outline = new MagnetOutline x: -23, y: -1, parent: @
 
@@ -76,7 +80,7 @@ class MagnetOutline extends Layer
 
 		super _.defaults options, name: 'outline', size: 0, backgroundColor: 'transparent'
 
-		color = FramerUtils.Color.cssRgba '#ffffff', .5
+		color = FramerUtils.Color.cssRgba '#000000', .5
 		lineProps =
 			width: 2, height: 2, borderRadius: 2
 			opacity: 0, backgroundColor: color, parent: @

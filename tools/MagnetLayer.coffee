@@ -20,6 +20,7 @@ class exports.MagnetLayer extends Layer
 		set: (v) -> unless @_showArea is (@_showArea = v) then @area.style =
 			MagnetLayer.AreaStyle[if @_showArea then 'show' else 'false']
 
+
 	constructor: (options={}) ->
 
 		@_config = _.pick options, MagnetLayer.Configs
