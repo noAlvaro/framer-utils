@@ -57,12 +57,15 @@ class exports.MagnetCursor extends Layer
 	sync: (e) =>
 		@frame = e
 		if e.magnetPoint
-			@placer.animate
-				point: (e.magnetLayer.area.convertPointToLayer e.magnetPoint, @), MagnetCursor.Animation
-			@outline.open()
+			point = e.magnetLayer.area.convertPointToLayer e.magnetPoint, @
+			method = @outline.open
 		else
-			@placer.animate point: 0, MagnetCursor.Animation
-			@outline.close()
+			point = x: 0, y: 0
+			method = @outline.close
+		if (FramerUtils.Math.distance @placer.point, point) > 10
+			@placer.animate point: point, MagnetCursor.Animation
+		else @placer.point = point
+		method()
 
 
 
@@ -113,5 +116,5 @@ class MagnetOutline extends Layer
 	startRotation: => @interval = setInterval (=> @o.rotation++), 1/30*1000
 	stopRotation: => clearInterval @interval; @o.rotation = 0
 
-	open: -> unless @opened then @a1.start(); @opened = true
-	close: -> if @opened then @b2.start(); @opened = false
+	open: => unless @opened then @a1.start(); @opened = true
+	close: => if @opened then @b2.start(); @opened = false
