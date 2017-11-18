@@ -61,7 +61,7 @@ class exports.MagnetCursor extends Layer
 	sync: (e) =>
 		@frame = e
 		if e.magnetPoint
-			point = e.magnetLayer.area.convertPointToLayer e.magnetPoint, @
+			point = e.magnetLayer._options.convertPointToLayer e.magnetPoint, @
 			method = @outline.open
 		else
 			point = x: 0, y: 0
