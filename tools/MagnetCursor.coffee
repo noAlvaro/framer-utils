@@ -31,16 +31,20 @@ class exports.MagnetCursor extends Layer
 
 	constructor: ->
 
+		for candidateMc in Framer.Device.hands.children
+			candidateMc.destroy() if candidateMc.constructor.name is @constructor.name
+
+
 		super size: 0, backgroundColor: 'transparent', parent: Framer.Device.hands
 		document.body.style.cursor = 'none'
 
-		@placer = new Layer name: 'placer', size: @size, parent: @
+		@placer = new Layer name: 'placer', size: @size, parent: @, backgroundColor: 'transparent'
 
 		radius = MagnetCursor.Size.up
 		@cursor = new Layer
 			name: 'cursor', parent: @placer
 			x: -radius, y: -radius, size: radius*2
-			borderRadius: radius
+			borderRadius: radius, backgroundColor: 'transparent'
 			gradient: MagnetCursor.Fill.up
 			shadow1: MagnetCursor.Bevel.up
 			shadow2: MagnetCursor.Shadow.one
@@ -49,7 +53,7 @@ class exports.MagnetCursor extends Layer
 		radius = MagnetCursor.Size.down
 		@cursor.states.down =
 			x: -radius, y: -radius, size: radius*2
-			borderRadius: radius
+			borderRadius: radius, backgroundColor: 'transparent'
 			gradient: MagnetCursor.Fill.down
 			shadow1: MagnetCursor.Bevel.down
 
