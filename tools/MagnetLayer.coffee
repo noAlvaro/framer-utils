@@ -18,7 +18,6 @@ class exports.MagnetLayer extends Layer
 		set: (v) -> v ?= MagnetOptions.Defaults; for k of MagnetOptions.Defaults
 			@_options[k] = v[k] unless v[k] is undefined
 
-
 	constructor: (options={}) -> # layer + magnet options
 
 		o = Object.keys MagnetOptions.Defaults
@@ -37,6 +36,7 @@ class exports.MagnetLayer extends Layer
 		o.magnetPoint =
 			x: @calculateAxis 'x', o.point.x
 			y: @calculateAxis 'y', o.point.y
+		o.snapPoint = @snapPoint
 
 	calculateAxis: (axis, point) ->
 		switch axis
@@ -55,7 +55,7 @@ class MagnetOptions extends Layer
 
 	@Defaults =
 		left: 0, right: 0, top: 0, bottom: 0
-		magnetX: .5, magnetY: .5, show: 'false'
+		magnetX: .5, magnetY: .5, show: false
 
 	@AreaStyle =
 		show:

@@ -1,4 +1,5 @@
 {FramerUtils} = require '../FramerUtils.coffee'
+{Ease} = require '../Ease.coffee'
 
 class exports.MagnetCursor extends Layer
 
@@ -22,10 +23,11 @@ class exports.MagnetCursor extends Layer
 		one: y: 2, blur: 4, color: new Color('black').alpha .2
 		two: y: 1, blur: 1, color: new Color('black').alpha .1
 
+	@Size = up: 23, down: 22
 
 	@Animation =
-		time: .05
-		curve: Bezier.easeOut
+		time: .1
+		curve: Ease.ExpoOut
 
 	constructor: ->
 
@@ -34,7 +36,7 @@ class exports.MagnetCursor extends Layer
 
 		@placer = new Layer name: 'placer', size: @size, parent: @
 
-		radius = 23
+		radius = MagnetCursor.Size.up
 		@cursor = new Layer
 			name: 'cursor', parent: @placer
 			x: -radius, y: -radius, size: radius*2
@@ -44,7 +46,7 @@ class exports.MagnetCursor extends Layer
 			shadow2: MagnetCursor.Shadow.one
 			shadow3: MagnetCursor.Shadow.two
 
-		radius = 22
+		radius = MagnetCursor.Size.down
 		@cursor.states.down =
 			x: -radius, y: -radius, size: radius*2
 			borderRadius: radius
@@ -52,26 +54,42 @@ class exports.MagnetCursor extends Layer
 			shadow1: MagnetCursor.Bevel.down
 
 		Framer.Device.screen.on Events.MouseMove, @sync
-		Framer.Device.screen.on Events.MouseDown, => @cursor.stateSwitch 'down'
-		Framer.Device.screen.on Events.MouseUp, => @cursor.animate 'default', time: .25
-		Framer.Device.screen.on "change:children", => print 'here'
+		Framer.Device.screen.on Events.MouseDown, @press
+		Framer.Device.screen.on Events.MouseUp, @release
+
+		@justReleased = false
 
 		@outline = new MagnetOutline x: -23, y: -1, parent: @
 
 	sync: (e) =>
-		@frame = e
-		if e.magnetPoint
-			point = e.magnetLayer._options.convertPointToLayer e.magnetPoint, @
-			method = @outline.open
-		else
-			point = x: 0, y: 0
-			method = @outline.close
+		p = _.pick e, ['x', 'y']
+		deltaX = p.x - @x; deltaY = (p.y - @y)
+		@point = p
 
-		if method() or @placer.isAnimating
-			@placer.animate point: point, MagnetCursor.Animation
+		point =
+		if @magnetPress then x: @placer.point.x - deltaX, y: @placer.point.y - deltaY
+		else if e.magnetPoint then method = @outline.open; @magnetPoint e.magnetLayer, e.magnetPoint
+		else method = @outline.close; point = x: 0, y: 0
+
+		if method?() or @placer.isAnimating or @justReleased
+			options = _.defaults time: (if @justReleased then 1 else .1), MagnetCursor.Animation
+			@placer.animate point, options; @justReleased = false
 		else @placer.point = point
 
+	magnetPoint: (magnetLayer, magnetPoint) ->
+		magnetLayer._options.convertPointToLayer magnetPoint, @
 
+	press: (e) =>
+		if e.snapPoint and e.magnetPoint
+			point = e.magnetLayer.convertPointToLayer e.snapPoint, @
+			@placer.animate point, MagnetCursor.Animation
+		@cursor.stateSwitch 'down'
+		@magnetPress = true if e.magnetPoint
+
+	release: (e) =>
+		if e.snapPoint and e.magnetPoint then point = @magnetPoint e.magnetLayer, e.magnetPoint
+		@cursor.animate 'default', time: .25
+		@magnetPress = false; @justReleased = true; @sync e
 
 
 class MagnetOutline extends Layer
@@ -94,7 +112,7 @@ class MagnetOutline extends Layer
 			width: 2, height: 2, borderRadius: 2
 			opacity: 0, backgroundColor: @_outlineColor, parent: @
 		radius = 23; offset = lineProps.width/2; gain = 14
-		time = .3; time1 = time/3; time2 = time/1.5
+		time = .5; time1 = time/3; time2 = time/1.5
 
 		@o = new Layer
 			name: 'o', y: offset-radius
@@ -109,10 +127,10 @@ class MagnetOutline extends Layer
 
 		@sides = [l, r, t, b]
 
-		@a1 = new Animation l, x: radius/2, width: radius/2, opacity: .75, {time: time1, curve: Bezier.easeIn}
-		a2 = new Animation l, x: radius/3*2, width: radius/3, opacity: 1, {time: time2, curve: Bezier.easeOut}
-		b1 = @a1.reverse(); b1.options = time: time2, curve: Bezier.easeOut
-		@b2 = a2.reverse(); @b2.options = time: time1, curve: Bezier.easeIn
+		@a1 = new Animation l, x: radius/2, width: radius/2, opacity: .75, {time: time1, curve: Ease.ExpoIn}
+		a2 = new Animation l, x: radius/3*2, width: radius/3, opacity: 1, {time: time2, curve: Ease.ExpoOut}
+		b1 = new Animation l, x: 0, width: 2, opacity: 0, {time: time2/2.5, curve: Ease.ExpoOut}
+		@b2 = new Animation l, x: radius/2, width: radius/2, opacity: .75, {time: time1/2.5, curve: Ease.ExpoIn}
 
 		l.on 'change:opacity', (e) =>
 			layer.opacity = l.opacity for layer in [r, t, b, @o]
