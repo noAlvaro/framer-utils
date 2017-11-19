@@ -36,8 +36,6 @@ class exports.MagnetLayer extends Layer
 			@["_#{e}"] = (o) => @addMagnetProperties o
 			@_options.on e, @["_#{e}"]
 
-		# @on Events.PanDown, -> print @
-
 
 	addMagnetProperties: (o) ->
 		o.magnetLayer = @
