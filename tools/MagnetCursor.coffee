@@ -38,13 +38,13 @@ class exports.MagnetCursor extends Layer
 		super size: 0, backgroundColor: 'transparent', parent: Framer.Device.hands
 		document.body.style.cursor = 'none'
 
-		@placer = new Layer name: 'placer', size: @size, parent: @, backgroundColor: 'transparent'
+		@placer = new Layer name: 'placer', size: @size, parent: @
 
 		radius = MagnetCursor.Size.up
 		@cursor = new Layer
 			name: 'cursor', parent: @placer
 			x: -radius, y: -radius, size: radius*2
-			borderRadius: radius, backgroundColor: 'transparent'
+			borderRadius: radius
 			gradient: MagnetCursor.Fill.up
 			shadow1: MagnetCursor.Bevel.up
 			shadow2: MagnetCursor.Shadow.one
@@ -53,7 +53,7 @@ class exports.MagnetCursor extends Layer
 		radius = MagnetCursor.Size.down
 		@cursor.states.down =
 			x: -radius, y: -radius, size: radius*2
-			borderRadius: radius, backgroundColor: 'transparent'
+			borderRadius: radius
 			gradient: MagnetCursor.Fill.down
 			shadow1: MagnetCursor.Bevel.down
 
@@ -66,14 +66,16 @@ class exports.MagnetCursor extends Layer
 		@outline = new MagnetOutline x: -23, y: -1, parent: @
 
 	sync: (e) =>
-		p = _.pick e, ['x', 'y']
-		deltaX = p.x - @x; deltaY = (p.y - @y)
-		@point = p
-
-		point =
-		if @magnetPress then x: @placer.point.x - deltaX, y: @placer.point.y - deltaY
-		else if e.magnetPoint then method = @outline.open; @magnetPoint e.magnetLayer, e.magnetPoint
-		else method = @outline.close; point = x: 0, y: 0
+		delta = x: e.x - @x, y: e.y - @y; @point = e
+		point = if e.magnetLayer?.draggable.isDragging # hoverpress-drag
+			method = @outline.open; @placer.point
+		else if e.magnetPoint and @magnetPress # hoverpress-nodrag
+			method = @outline.open; x: @placer.x - delta.x, y: @placer.y - delta.y
+		else if @magnetPress # press-nodrag
+			method = @outline.open; x: @placer.x - delta.x, y: @placer.y - delta.y
+		else if e.magnetPoint # hover-move
+			method = @outline.open; @magnetPoint e.magnetLayer, e.magnetPoint
+		else method = @outline.close; point = x: 0, y: 0 # none
 
 		if method?() or @placer.isAnimating or @justReleased
 			options = _.defaults time: (if @justReleased then 1 else .1), MagnetCursor.Animation
@@ -84,6 +86,7 @@ class exports.MagnetCursor extends Layer
 		magnetLayer._options.convertPointToLayer magnetPoint, @
 
 	press: (e) =>
+		@sync e # on-press instant sync? shouldn't it be on layer movement?
 		if e.snapPoint and e.magnetPoint
 			point = e.magnetLayer.convertPointToLayer e.snapPoint, @
 			@placer.animate point, MagnetCursor.Animation
@@ -94,6 +97,8 @@ class exports.MagnetCursor extends Layer
 		if e.snapPoint and e.magnetPoint then point = @magnetPoint e.magnetLayer, e.magnetPoint
 		@cursor.animate 'default', time: .25
 		@magnetPress = false; @justReleased = true; @sync e
+
+	pan: (e) =>
 
 
 class MagnetOutline extends Layer

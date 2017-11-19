@@ -6,6 +6,10 @@ class exports.MagnetLayer extends Layer
 		Events.MouseUp		, Events.MouseDown
 		Events.MouseOver	, Events.MouseOut
 		Events.MouseMove	, Events.MouseWheel
+		Events.Pan			#, Events.PanMove #issue: https://github.com/koenbok/Framer/issues/552
+		Events.PanStart		, Events.PanEnd
+		Events.PanLeft		, Events.PanRight
+		Events.PanUp		, Events.PanDown
 	]
 
 
@@ -23,13 +27,17 @@ class exports.MagnetLayer extends Layer
 		o = Object.keys MagnetOptions.Defaults
 
 		super _.omit options, o
-		@ignoreEvents = true # do not change!
+		@draggable.enabled = false	# do not change!
+		@ignoreEvents = true		# do not change!
 
 		@_options = new MagnetOptions @, _.pick options, o
 
 		for e in MagnetLayer.Events
 			@["_#{e}"] = (o) => @addMagnetProperties o
 			@_options.on e, @["_#{e}"]
+
+		# @on Events.PanDown, -> print @
+
 
 	addMagnetProperties: (o) ->
 		o.magnetLayer = @
@@ -55,7 +63,7 @@ class MagnetOptions extends Layer
 
 	@Defaults =
 		left: 0, right: 0, top: 0, bottom: 0
-		magnetX: .5, magnetY: .5, show: false
+		magnetX: .5, magnetY: .5, weight: 0, show: false
 
 	@AreaStyle =
 		show:
@@ -86,22 +94,24 @@ class MagnetOptions extends Layer
 
 	@define 'magnetX',
 		get: -> @_magnetX
-		set: (v) -> unless @_magnetX is (v ?= MagnetOptions.Defaults.magnetX)
-			@_magnetX = v
+		set: (v) -> @_magnetX = (v ?= MagnetOptions.Defaults.magnetX)
 
 	@define 'magnetY',
 		get: -> @_magnetY
-		set: (v) -> unless @_magnetY is (v ?= MagnetOptions.Defaults.magnetY)
-			@_magnetY = v
+		set: (v) -> @_magnetY = (v ?= MagnetOptions.Defaults.magnetY)
+
+	@define 'weight',
+		get: -> @_weight
+		set: (v) -> @_weight = (v ?= MagnetOptions.Defaults.weight)
 
 	@define 'show',
 		get: -> @_show
 		set: (v) -> unless @_show is (v ?= MagnetOptions.Defaults.show)
 			@style = MagnetOptions.AreaStyle[if (@_show = v) then 'show' else 'hide']
 
-
 	constructor: (parent, options) ->
 		super parent: parent, borderRadius: 8
+		options[p] ?= MagnetOptions.Defaults[p] for p in ['weight']
 		@[n] = options[n] for n in Object.keys MagnetOptions.Defaults
 
 	fixWidth: -> @width = @parent.width + @_left + @_right
