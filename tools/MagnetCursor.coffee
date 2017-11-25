@@ -67,7 +67,10 @@ class exports.MagnetCursor extends Layer
 
 	sync: (e) =>
 		delta = x: e.x - @x, y: e.y - @y; @point = e
-		point = if e.magnetLayer?.draggable.isDragging # hoverpress-drag
+
+		point = if (not e.magnetLayer and @magnetPress) # hoverpress-drag-updateissue
+			method = @outline.open; @savedPlacerPoint
+		else if e.magnetLayer?.draggable.isDragging # hoverpress-drag
 			method = @outline.open; @placer.point
 		else if e.magnetPoint and @magnetPress # hoverpress-nodrag
 			method = @outline.open; x: @placer.x - delta.x, y: @placer.y - delta.y
@@ -76,6 +79,7 @@ class exports.MagnetCursor extends Layer
 		else if e.magnetPoint # hover-move
 			method = @outline.open; @magnetPoint e.magnetLayer, e.magnetPoint
 		else method = @outline.close; point = x: 0, y: 0 # none
+		@savedPlacerPoint = point
 
 		if method?() or @placer.isAnimating or @justReleased
 			options = _.defaults time: (if @justReleased then 1 else .1), MagnetCursor.Animation
