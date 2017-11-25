@@ -81,7 +81,7 @@ class exports.MagnetCursor extends Layer
 		else method = @outline.close; point = x: 0, y: 0 # none
 		@savedPlacerPoint = point
 
-		if method?() or @placer.isAnimating or @justReleased
+		if method?() or @placer.isAnimating or @justReleased or e.magnetLayer?.draggable.isMoving
 			options = _.defaults time: (if @justReleased then 1 else .1), MagnetCursor.Animation
 			@placer.animate point, options; @justReleased = false
 		else @placer.point = point
