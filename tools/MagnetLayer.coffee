@@ -53,7 +53,9 @@ class exports.MagnetLayer extends Layer
 			position = [length * push, length]
 		else
 			length = side + edge[1]; interval = [0, length]
+			if axis is 'y' then (print  side, edge) else print ''
 			position = [ side + edge[0], ( side + edge[0] ) + ( length * (1 -push) ) ]
+			t = 'else'
 		Math.round(Utils.modulate candidate, interval, position)
 
 
@@ -87,7 +89,7 @@ class MagnetOptions extends Layer
 
 	@define 'bottom',
 		get: -> @_bottom
-		set: (v) -> unless @_bottom is (v ?= MagnetOptions.Defaults.bototm)
+		set: (v) -> unless @_bottom is (v ?= MagnetOptions.Defaults.bottom)
 			@_bottom = v; @fixHeight()
 
 	@define 'magnetX',
