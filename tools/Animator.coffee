@@ -19,7 +19,7 @@ class exports.Animator extends Layer
 		return unless totalChildren-- and typeof @_progress is 'number'
 		progressFix = (1 + @range) * @_progress
 		for child, index in @children
-			position = child.index / totalChildren
+			position = index / totalChildren
 			diff = Math.max 0, progressFix - position
 			value = Math.min 1, diff / @range
 			unless @lastState[index] is value
