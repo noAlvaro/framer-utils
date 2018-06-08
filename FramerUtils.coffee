@@ -45,6 +45,12 @@ class exports.FramerUtils
 			[a, b] = [b, a] if a.length > b.length
 			value for value in a when value in b
 
+		swap: (array, indexA, indexB) ->
+			temp = array[indexA]
+			array[indexA] = array[indexB]
+			array[indexB] = temp
+			array
+
 	Array::first = -> @[0]
 	Array::last = -> @[@length - 1]
 	Array::rotate = (reverse=false) -> if reverse then @push @shift() else @unshift @pop(); @
@@ -65,12 +71,9 @@ class exports.FramerUtils
 			"rgba(#{rgb.r},#{rgb.g},#{rgb.b},#{alpha})"
 
 
-	@Math:
+	@Geometry:
 
 		distance: (fromPoint, toPoint) -> Math.sqrt (fromPoint.x - toPoint.x) * (fromPoint.x - toPoint.x) + (fromPoint.y - toPoint.y) * (fromPoint.y - toPoint.y)
-
-
-	@Geometry:
 
 		rectEdgePoint: (fromPoint, rectFrame, validateInput) ->
 			# Returns the intersection/prolongation point between @fromPoint and @rectFrame's center
