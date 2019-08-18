@@ -1,0 +1,13 @@
+{
+  "name": "framer-utils",
+  "version": "2.0.0",
+  "description": "Framer Classic boilerplate",
+  "license": "GPL-3.0-only",
+  "repository": "noAlvaro/framer-utils",
+  "keywords": [
+    "framer",
+    "classic",
+    "coffeescript",
+    "prototype"
+  ]
+}
